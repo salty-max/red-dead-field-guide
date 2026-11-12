@@ -1,4 +1,7 @@
-(() => {
+import type { RawGroup, RawRow } from "../types";
+
+const RDR_GROUPS: RawGroup[] = [];
+{
   const root = "https://www.ireddead.com/rdr/";
   const locations = root + "maps/towns-and-locations";
   const bounties = root + "guides/bounty-hunting";
@@ -7,15 +10,15 @@
   const weapons = root + "maps/rare-weapons";
   const games = root + "guides/activities-and-minigames";
   const jobs = root + "guides/jobs";
-  const slug = (name) => name.normalize("NFD").replace(/[\u0300-\u036f’']/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-");
-  function group(chapter,title,location,category,source,entries,note = "") {
-    window.RDR_GROUPS.push({
+  const slug = (name: string) => name.normalize("NFD").replace(/[\u0300-\u036f’']/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-");
+  function group(chapter: number, title: string, location: string, category: string, source: string, entries: [name: string, text?: string, id?: string][], note = "") {
+    RDR_GROUPS.push({
       chapter,title,location,source,note,
-      rows:entries.map(([name,text = "",id]) => [id ?? category+"-"+slug(name),category,name,text])
+      rows:entries.map(([name,text = "",id]): RawRow => [id ?? category+"-"+slug(name),category,name,text])
     });
   }
-  function county(chapter,name,vendor,places) {
-    group(chapter,name+" map locations",name,"location",locations,[name,...places.split("|")].map(place=>[place]),
+  function county(chapter: number, name: string, vendor: string, places: string) {
+    group(chapter,name+" map locations",name,"location",locations,[name,...places.split("|")].map((place): [string] => [place]),
       "Buy the "+name+" map at "+vendor+" and use it from your satchel. You can also ride close enough to discover each entry. Check this list against the labels on your world map.");
   }
   county(1,"Cholla Springs","the Armadillo general store","Armadillo|Coot’s Chapel|Critchley’s Ranch|Hamlin’s Passing|Jorge’s Gap|Lake Don Julio|Mercer Station|Odd Fellow’s Rest|Pleasance House|Rattlesnake Hollow|Ridgewood Farm|Riley’s Charge|Río del Lobo|The Hanging Rock|Twin Rocks|Two Crows|Venter’s Place");
@@ -28,8 +31,8 @@
   county(3,"Tall Trees","the Manzanita Post general store","Aurora Basin|Bearclaw Camp|Cochinay|Manzanita Post|Mason’s Bridge|Montanna Ford|Nekoti Rock|Pacific Union Railroad Camp|Tanner’s Reach|Tanner’s Span");
   county(3,"Great Plains","the Blackwater general store","Beecher’s Hope|Blackwater|Broken Tree|Dixon Crossing|Wreck of the Serendipity");
 
-  function bountyLocations(chapter,region,towns,targets) {
-    group(chapter,region+" bounty locations",towns,"bounty",bounties,targets.split("|").map(target=>[target]),
+  function bountyLocations(chapter: number, region: string, towns: string, targets: string) {
+    group(chapter,region+" bounty locations",towns,"bounty",bounties,targets.split("|").map((target): [string] => [target]),
       "After Political Realities in Armadillo, look for the white skull marking a wanted poster. Take regional posters as they appear in daylight. Check a location after bringing the fugitive or proof back to the law. Repeating a target location does not add completion credit.");
   }
   bountyLocations(1,"New Austin","Armadillo · Rathskeller Fork · MacFarlane’s Ranch","Brittlebrush Trawl|The Hanging Rock|Mercer Station|Mescalero|Rattlesnake Hollow|Repentance Rock|Río del Lobo|Silent Stead");
@@ -107,4 +110,6 @@
   group(2,"Arm wrestling","Plainview · Agave Viejo · Casa Madrugada","minigame",games,[
     ["Arm Wrestling","Available after We Shall Be Together in Paradise. Bet low, hold the input to recover strength and push when your opponent tires. Beat all challengers at the table. Later, a specific table also awards an outfit scrap."]
   ]);
-})();
+}
+
+export default RDR_GROUPS;

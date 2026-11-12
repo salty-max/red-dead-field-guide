@@ -1,14 +1,17 @@
+import type { RawGroup, RawRow } from "../types";
+
+const RDR_GROUPS: RawGroup[] = [];
 // Red Dead Redemption side routes. Stable IDs are shared by the guide and checklist.
 {
   const guides = "https://www.ireddead.com/rdr/guides/";
   const maps = "https://www.ireddead.com/rdr/maps/";
   const strangers = guides + "stranger-side-mission-list";
   const outfits = guides + "outfits";
-  const stranger = (slug, title, directions) => ["stranger-" + slug, "stranger", title, directions, guides + slug];
-  const scrap = (id, title, directions, map) => ["scrap-" + id, "scrap", title, directions, maps + map];
-  const outfit = (id, title, directions, map) => ["outfit-" + id, "outfit", title, directions, map ? maps + map : outfits];
+  const stranger = (slug: string, title: string, directions: string): RawRow => ["stranger-" + slug, "stranger", title, directions, guides + slug];
+  const scrap = (id: string, title: string, directions: string, map: string): RawRow => ["scrap-" + id, "scrap", title, directions, maps + map];
+  const outfit = (id: string, title: string, directions: string, map?: string): RawRow => ["outfit-" + id, "outfit", title, directions, map ? maps + map : outfits];
 
-  window.RDR_GROUPS.push(
+  RDR_GROUPS.push(
     {
       chapter: 1, title: "Strangers on the ranch roads", location: "Hennigan’s Stead · Armadillo", source: strangers, rows: [
         stranger("flowers-for-a-lady", "Flowers for a Lady",
@@ -184,3 +187,5 @@
     },
   );
 }
+
+export default RDR_GROUPS;

@@ -4,13 +4,23 @@ A spoiler-aware, unofficial companion for the original *Red Dead Redemption* cam
 
 ## Run it locally
 
-Run this command from the project folder, then visit [localhost:8000](http://localhost:8000).
+A React 19 + TypeScript single-page app built with Vite. You need Node 20+ and pnpm.
 
-```sh
-python3 -m http.server 8000 --directory dist
+```bash
+pnpm install
+pnpm dev        # http://localhost:5173
+pnpm build      # typecheck + production build into dist/
+pnpm preview    # serve the production build
+pnpm test       # Vitest data, state and app-flow tests
+pnpm lint
+pnpm icons      # regenerate public/icons
 ```
 
-The site uses static HTML, CSS and JavaScript. There are no packages to install. Serve the contents of `dist` with any static host.
+Routes are real paths (`/guide/3`, `/checklist/location`, `/dashboard`, `/sources`), so a static host needs a fallback to `index.html`. The app is an installable PWA (vite-plugin-pwa): it precaches the shell, fonts and banners, works offline, and asks before swapping in a new version. Walkthrough content lives in `src/data`; progress state is in `src/store`.
+
+## Deploy
+
+Intended for Vercel from `main`. `vercel.json` sets the build (`pnpm build` → `dist`), a catch-all rewrite to `index.html`, a strict CSP (no inline scripts), security headers and cache rules. Check header changes against a real preview deployment, not just locally.
 
 ## Use the guide
 
@@ -24,7 +34,7 @@ The in-game percentage applies to the base campaign. *Undead Nightmare*, multipl
 
 ## Artwork and fonts
 
-The five chapter banners are original illustrations generated with OpenAI’s built-in image generator. They use a cinematic frontier look with the subject on the right and shaded foreground on the left. They depict a New Austin rail town, a Nuevo Paraíso adobe mission, a Blackwater waterfront, a Great Plains ranch, and a frontier valley. The images are decorative. Barlow Condensed and DM Sans licenses are in `dist/assets`. *Red Dead Redemption* belongs to Rockstar Games.
+The five chapter banners are original illustrations generated with OpenAI’s built-in image generator. They use a cinematic frontier look with the subject on the right and shaded foreground on the left. They depict a New Austin rail town, a Nuevo Paraíso adobe mission, a Blackwater waterfront, a Great Plains ranch, and a frontier valley. The images are decorative. Barlow Condensed and DM Sans licenses are in `public/fonts`. *Red Dead Redemption* belongs to Rockstar Games.
 
 ### Banner prompts
 

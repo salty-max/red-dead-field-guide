@@ -1,4 +1,8 @@
-window.RDR_GROUPS.push(
+import type { RawGroup } from "../types";
+
+const RDR_GROUPS: RawGroup[] = [];
+
+RDR_GROUPS.push(
   {
     chapter: 3,
     title: "The Blackwater investigations",
@@ -72,3 +76,5 @@ window.RDR_GROUPS.push(
     ],
   },
 );
+
+export default RDR_GROUPS;

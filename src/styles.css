@@ -1,5 +1,5 @@
-@font-face{font-family:"DM Sans";src:url("assets/dm-sans.woff2") format("woff2");font-weight:400 700;font-display:swap}
-@font-face{font-family:"Barlow Condensed";src:url("assets/barlow-condensed.woff2") format("woff2");font-weight:700;font-display:swap}
+@font-face{font-family:"DM Sans";src:url("/fonts/dm-sans.woff2") format("woff2");font-weight:400 700;font-display:swap}
+@font-face{font-family:"Barlow Condensed";src:url("/fonts/barlow-condensed.woff2") format("woff2");font-weight:700;font-display:swap}
 :root{color-scheme:light;--forest:#231812;--pine:#302019;--fern:#873d29;--moss:#7d6654;--gold:#d7ad72;--paper:#f3ecdf;--white:#fffbf2;--ink:#32271f;--muted:#67584a;--line:#e1d2bf;--display:"Barlow Condensed","Arial Narrow",sans-serif;--sans:"DM Sans",system-ui,sans-serif;--bar:69px;--rail:249px}
 *{box-sizing:border-box}
 html{scroll-padding-top:calc(var(--bar) + 24px);scrollbar-color:#b6a38c var(--paper)}
