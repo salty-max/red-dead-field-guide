@@ -73,7 +73,6 @@ export function DashboardPage() {
 
 const pts = (value: number) => (Math.round(value * 10) / 10).toFixed(1);
 
-/** Which categories still cost the most in-game percentage points. */
 function WhatsLeft() {
   const checks = useProgress((s) => s.data.checks);
   const items = pointsLeft(checks);

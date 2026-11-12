@@ -7,7 +7,6 @@ import { useHeldRows } from "../lib/useHeldRows";
 import { isOpen, useProgress } from "../store/progress";
 import type { Chapter } from "../types";
 
-/** The next unchecked steps in route order across every revealed chapter. */
 export function NextUp() {
   const data = useProgress((s) => s.data);
   const openIds = chapters.filter((chapter) => isOpen(data, chapter.id)).map((chapter) => chapter.id);
@@ -52,7 +51,6 @@ export function NextUp() {
   );
 }
 
-/** Pinned per-chapter reminder of entries that can be lost by moving on. Hidden when none remain. */
 export function MissablesStrip({ chapter }: { chapter: Chapter }) {
   // Re-mount per chapter so a held list never leaks into the next one.
   return <MissablesList key={chapter.id} chapter={chapter} />;

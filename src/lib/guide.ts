@@ -104,7 +104,6 @@ export const statusOptions: [string, string][] = [
   ["done", "Completed"],
 ];
 
-/** Display name for a row tag (a category, or the cross-cutting "missable"). */
 export const tagName = (tag: string) => (isCategory(tag) ? cats[tag][0] : tag === "missable" ? "Missable" : tag);
 
 /** Categories that are bulk or sweep work: left out of "Next up" unless nothing else remains. */
@@ -120,7 +119,6 @@ export function nextUp(checks: Record<string, true>, chapterIds: number[], count
   return (steps.length ? steps : rows).slice(0, count);
 }
 
-/** In-game percentage points still to earn, per category, biggest first. */
 export function pointsLeft(checks: Record<string, true>): { tag: CategoryId; left: number; total: number }[] {
   const byTag = new Map<CategoryId, { left: number; total: number }>();
   for (const row of coreRows) {
@@ -132,7 +130,6 @@ export function pointsLeft(checks: Record<string, true>): { tag: CategoryId; lef
   return [...byTag].map(([tag, v]) => ({ tag, ...v })).filter((item) => item.total > 0).sort((a, b) => b.left - a.left);
 }
 
-/** Missable rows of a chapter that are still unchecked. */
 export const missablesLeft = (chapter: Chapter, checks: Record<string, true>) =>
   chapterRows(chapter).filter((row) => row.missable && checks[row.id] !== true);
 

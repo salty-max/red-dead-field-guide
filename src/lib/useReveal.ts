@@ -2,7 +2,6 @@ import { useNavigate } from "react-router";
 import { useProgress } from "../store/progress";
 import { useUi } from "../store/ui";
 
-/** Ask before revealing spoilers through a chapter, then open it. */
 export function useReveal() {
   const navigate = useNavigate();
   const openDialog = useUi((s) => s.openDialog);
