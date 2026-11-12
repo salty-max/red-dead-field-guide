@@ -1,13 +1,16 @@
-(() => {
+import type { RawGroup, RawRow } from "../types";
+
+const RDR_GROUPS: RawGroup[] = [];
+{
   const challengeGuide = "https://www.powerpyx.com/red-dead-redemption-all-challenges-guide/";
   const treasureGuide = "https://www.powerpyx.com/red-dead-redemption-all-treasure-locations/";
   const plants = "https://www.ireddead.com/rdr/maps/plants";
   const animals = "https://www.ireddead.com/rdr/maps/animals";
-  function route(chapter,name,key,start,region,rows,source=challengeGuide) {
-    window.RDR_GROUPS.push({
+  function route(chapter: number, name: string, key: string, start: number, region: string, rows: [label: string, note: string, reference?: string][], source = challengeGuide) {
+    RDR_GROUPS.push({
       chapter,title:name+" challenges",location:region,source,
       note:"Complete the ranks in order. Ranks 5 and 10 each add one point to the game’s completion percentage.",
-      rows:rows.map(([label,note,reference],index)=> {
+      rows:rows.map(([label,note,reference],index): RawRow => {
         const rank=start+index;
         return [key+"-"+rank,"challenge",name+" "+rank+" · "+label,note,reference];
       })
@@ -77,4 +80,6 @@
     ["Pickett’s Gold","Visit the Broken Tree east of Beecher’s Hope. Look for the short broken stone wall at its base and inspect the gap between the wall sections."],
     ["Stonewall’s Gold","Ride to Nekoti Rock north of Manzanita Post. Dismount and follow the rising path to the cave. Check for wildlife before searching the stone pile at the back."]
   ],treasureGuide);
-})();
+}
+
+export default RDR_GROUPS;

@@ -1,13 +1,16 @@
-(() => {
+import type { RawGroup, RawRow } from "../types";
+
+const RDR_GROUPS: RawGroup[] = [];
+{
   const guideRoot = "https://www.ireddead.com/rdr/guides/";
-  const mission = (slug, title, directions) => [
+  const mission = (slug: string, title: string, directions: string): RawRow => [
     "mission-" + slug, "mission", title, directions, guideRoot + slug
   ];
-  const group = (chapter, title, location, rows) => ({
+  const group = (chapter: number, title: string, location: string, rows: RawRow[]): RawGroup => ({
     chapter, title, location, source: guideRoot + "story-mission-list", rows
   });
 
-  window.RDR_GROUPS.push(
+  RDR_GROUPS.push(
     group(1, "A foothold in New Austin", "Armadillo · MacFarlane’s Ranch", [
       mission("exodus-in-america", "Exodus in America",
         "This starts when you begin a new game. Once you control John in Armadillo, go to the saloon marker and meet Jake. Mount the horse outside and match Jake’s pace, waiting for the train before you cross the tracks. Stay with him until he stops outside Fort Mercer, then ride up to the entrance marker. The rest is scripted and the next mission starts automatically."),
@@ -120,4 +123,6 @@
         "Go to the Escalera mission marker after El Presidio. Win the opening duel, clear the jail entrance and shoot the locks on the three cells. Work uphill with the rebels, clear the manor approach and cover the gate while the others force the door. After entering the manor, follow the chase route out the back and mount a horse. Clear the escort, catch the wagon and resolve the final encounter to open West Elizabeth.")
     ])
   );
-})();
+}
+
+export default RDR_GROUPS;
