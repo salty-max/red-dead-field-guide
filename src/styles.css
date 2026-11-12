@@ -459,3 +459,6 @@ body{font-size:16px}
   .next-up li,.missables li{gap:10px}
   .toast-stack{left:12px;right:12px;bottom:12px;max-width:none}
 }
+
+.next-up li.ticked strong,.missables li.ticked strong{color:var(--muted);text-decoration:line-through;text-decoration-thickness:1px}
+.next-up-advance{margin-top:8px}

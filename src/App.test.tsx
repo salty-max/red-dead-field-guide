@@ -57,4 +57,16 @@ describe("App", () => {
     for (const link of screen.getAllByRole("link", { name: /^Source for/ })) expect(link).toHaveAccessibleName();
     expect(screen.queryByRole("link", { name: "Source" })).toBeNull();
   });
+  it("keeps a ticked Next up step in place until you ask for the next ones", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await screen.findByRole("heading", { level: 2, name: "Next up" });
+    const list = () => within(screen.getByRole("region", { name: "Next up" }));
+    const idsBefore = list().getAllByRole("checkbox").map((box) => box.id);
+    await user.click(list().getAllByRole("checkbox")[0]);
+    expect(list().getAllByRole("checkbox").map((box) => box.id)).toEqual(idsBefore);
+    expect(list().getAllByRole("checkbox")[0]).toBeChecked();
+    await user.click(list().getByRole("button", { name: "Show next steps" }));
+    expect(list().getAllByRole("checkbox").map((box) => box.id)).not.toContain(idsBefore[0]);
+  });
 });
