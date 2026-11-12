@@ -6,6 +6,7 @@ import world from "../data/world";
 import challenges from "../data/challenges";
 import type { Chapter, Group, RawGroup, Row } from "../types";
 import type { IconName } from "../components/Icon";
+import { missables } from "../data/missables";
 
 export const CHAPTER_COUNT = rawChapters.length;
 
@@ -31,7 +32,7 @@ export const isCategory = (value: string | undefined): value is CategoryId =>
   value !== undefined && Object.hasOwn(cats, value);
 
 /** How much each entry adds to the game's in-game completion percentage. */
-const weights: Record<string, number> = {
+export const weights: Record<string, number> = {
   mission: 1,
   stranger: 0.5,
   location: 6 / 94,
@@ -44,6 +45,7 @@ const weights: Record<string, number> = {
   minigame: 0.5,
 };
 
+const missableIds = new Set(missables.map((item) => item.id));
 const rawGroups: RawGroup[] = [...early, ...late, ...side, ...world, ...challenges];
 
 export const chapters: Chapter[] = rawChapters.map((chapter) => ({
@@ -66,7 +68,8 @@ export const chapters: Chapter[] = rawChapters.map((chapter) => ({
             chapter: chapter.id,
             location: group.location,
             group: group.title,
-            tags: [category],
+            tags: missableIds.has(id) ? [category, "missable"] : [category],
+            missable: missableIds.has(id) ? true : undefined,
             reference,
             // Ambient challenge ranks 5 and 10 are the only ones that add credit.
             weight: category === "challenge" && /-(5|10)$/.test(id) ? 1 : (weights[category] ?? 0),
@@ -100,3 +103,38 @@ export const statusOptions: [string, string][] = [
   ["todo", "Unfinished"],
   ["done", "Completed"],
 ];
+
+/** Display name for a row tag (a category, or the cross-cutting "missable"). */
+export const tagName = (tag: string) => (isCategory(tag) ? cats[tag][0] : tag === "missable" ? "Missable" : tag);
+
+/** Categories that are bulk or sweep work: left out of "Next up" unless nothing else remains. */
+const sweepTags = new Set<string>(["location", "scrap", "optional"]);
+
+/**
+ * The next unchecked steps in route order (chapters, then groups, then rows) across the given
+ * chapters. Sweep entries only appear when nothing else is left.
+ */
+export function nextUp(checks: Record<string, true>, chapterIds: number[], count = 3): Row[] {
+  const rows = chapters.filter((chapter) => chapterIds.includes(chapter.id)).flatMap(chapterRows).filter((row) => checks[row.id] !== true);
+  const steps = rows.filter((row) => !sweepTags.has(primaryTag(row)));
+  return (steps.length ? steps : rows).slice(0, count);
+}
+
+/** In-game percentage points still to earn, per category, biggest first. */
+export function pointsLeft(checks: Record<string, true>): { tag: CategoryId; left: number; total: number }[] {
+  const byTag = new Map<CategoryId, { left: number; total: number }>();
+  for (const row of coreRows) {
+    const entry = byTag.get(primaryTag(row)) ?? { left: 0, total: 0 };
+    entry.total += row.weight;
+    if (checks[row.id] !== true) entry.left += row.weight;
+    byTag.set(primaryTag(row), entry);
+  }
+  return [...byTag].map(([tag, v]) => ({ tag, ...v })).filter((item) => item.total > 0).sort((a, b) => b.left - a.left);
+}
+
+/** Missable rows of a chapter that are still unchecked. */
+export const missablesLeft = (chapter: Chapter, checks: Record<string, true>) =>
+  chapterRows(chapter).filter((row) => row.missable && checks[row.id] !== true);
+
+/** How far the game's own number is from the estimate, in points (positive: game is ahead). */
+export const calibrationDelta = (estimated: number, reported: number) => Math.round((reported - estimated) * 10) / 10;

@@ -16,6 +16,8 @@ export interface RawChapter {
   title: string;
   region: string;
   intro: string;
+  /** What the rail shows while the chapter is hidden: a place name, never story. */
+  teaser: string;
 }
 
 export interface Row {
@@ -29,6 +31,8 @@ export interface Row {
   reference?: string;
   /** Share of the game's completion percentage this row is worth. */
   weight: number;
+  /** Can be lost for good if you move on (see src/data/missables.ts). */
+  missable?: true;
 }
 
 export interface Group {
@@ -46,10 +50,13 @@ export interface Chapter extends RawChapter {
 }
 
 export interface ProgressState {
-  version: 1;
+  /** 2 adds `reported`. Version 1 backups are still accepted on import. */
+  version: 2;
   guide: "red-dead-redemption";
   checks: Record<string, true>;
   ceiling: number;
   spoilers: boolean;
   chapter: number;
+  /** The percentage the player read in the game (Stats → General), or null. */
+  reported: number | null;
 }

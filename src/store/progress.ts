@@ -21,8 +21,11 @@ interface ProgressStore {
   data: ProgressState;
   storageError: boolean;
   setCheck: (id: string, checked: boolean) => void;
-  /** Tick several entries at once (a whole county of map locations). */
-  checkMany: (ids: string[]) => void;
+  /** Set several entries at once (a group's Check all / Uncheck all). */
+  setMany: (ids: string[], checked: boolean) => void;
+  /** Put entries back to an earlier state (undo): ids in `prev` become checked, the rest unchecked. */
+  restore: (ids: string[], prev: Record<string, true>) => void;
+  setReported: (value: number | null) => void;
   visitChapter: (chapter: number) => void;
   reveal: (chapter: number) => void;
   saveSettings: (settings: { spoilers: boolean; ceiling: number }) => void;
@@ -55,12 +58,25 @@ export const useProgress = create<ProgressStore>((set, get) => {
         else delete checks[id];
         return { ...s, checks };
       }),
-    checkMany: (ids) =>
+    setMany: (ids, checked) =>
       commit((s) => {
         const checks = { ...s.checks };
-        for (const id of ids) checks[id] = true;
+        for (const id of ids) {
+          if (checked) checks[id] = true;
+          else delete checks[id];
+        }
         return { ...s, checks };
       }),
+    restore: (ids, prev) =>
+      commit((s) => {
+        const checks = { ...s.checks };
+        for (const id of ids) {
+          if (prev[id] === true) checks[id] = true;
+          else delete checks[id];
+        }
+        return { ...s, checks };
+      }),
+    setReported: (value) => commit((s) => ({ ...s, reported: value })),
     visitChapter: (chapter) => {
       if (get().data.chapter !== chapter) commit((s) => ({ ...s, chapter }));
     },

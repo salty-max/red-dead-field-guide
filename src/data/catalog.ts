@@ -1,11 +1,11 @@
 import type { RawChapter } from "../types";
 
 export const rawChapters: RawChapter[] = [
-  {id:1,title:"New Austin",region:"Armadillo · MacFarlane’s Ranch · Fort Mercer",intro:"Get your bearings at the ranch, work through the leads around Armadillo, and pick up the early jobs, maps and challenges as you ride."},
-  {id:2,title:"Nuevo Paraíso",region:"Escalera · Chuparosa · Diez Coronas",intro:"Cross the river and follow the parallel mission strands through Mexico. Use stops in Escalera and Chuparosa to combine side jobs, purchases and outfit scraps."},
-  {id:3,title:"West Elizabeth",region:"Blackwater · Great Plains · Tall Trees",intro:"Follow the leads out of Blackwater. This region also opens the last map counties and several final ranks in the ambient challenges."},
-  {id:4,title:"Beecher’s Hope",region:"Great Plains",intro:"Follow the ranch mission markers. Return to the journal after the final main mission for the last Stranger task and any unfinished requirements."},
-  {id:5,title:"Completion sweep",region:"All territories",intro:"Finish the last unlocks, then compare the field checklist with Stats → General in your game. The checklist lets you jump back to any missed requirement."}
+  {id:1,teaser:"New Austin",title:"New Austin",region:"Armadillo · MacFarlane’s Ranch · Fort Mercer",intro:"Get your bearings at the ranch, work through the leads around Armadillo, and pick up the early jobs, maps and challenges as you ride."},
+  {id:2,teaser:"Nuevo Paraíso",title:"Nuevo Paraíso",region:"Escalera · Chuparosa · Diez Coronas",intro:"Cross the river and follow the parallel mission strands through Mexico. Use stops in Escalera and Chuparosa to combine side jobs, purchases and outfit scraps."},
+  {id:3,teaser:"West Elizabeth",title:"West Elizabeth",region:"Blackwater · Great Plains · Tall Trees",intro:"Follow the leads out of Blackwater. This region also opens the last map counties and several final ranks in the ambient challenges."},
+  {id:4,teaser:"Late game",title:"Beecher’s Hope",region:"Great Plains",intro:"Follow the ranch mission markers. Return to the journal after the final main mission for the last Stranger task and any unfinished requirements."},
+  {id:5,teaser:"Late game",title:"Completion sweep",region:"All territories",intro:"Finish the last unlocks, then compare the field checklist with Stats → General in your game. The checklist lets you jump back to any missed requirement."}
 ];
 export const sources: [label: string, url: string][] = [
   ["Original game and current releases","https://www.rockstargames.com/reddeadredemption"],
