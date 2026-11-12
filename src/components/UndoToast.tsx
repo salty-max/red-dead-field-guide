@@ -4,7 +4,6 @@ import { useUi } from "../store/ui";
 
 const LIFETIME_MS = 8000;
 
-/** Short-lived confirmation with Undo for a check change. Announced as a status message. */
 export function UndoToast() {
   const toast = useUi((s) => s.toast);
   const dismiss = useUi((s) => s.dismissToast);

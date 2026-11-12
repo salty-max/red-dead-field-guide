@@ -5,7 +5,6 @@ import { readPercent } from "../lib/progress-state";
 import { useProgress } from "../store/progress";
 import { useUi } from "../store/ui";
 
-/** Lets the player enter the game's own percentage and shows how far the estimate is off. */
 export function Calibration() {
   const reported = useProgress((s) => s.data.reported);
   const checks = useProgress((s) => s.data.checks);

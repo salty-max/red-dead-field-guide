@@ -21,7 +21,6 @@ interface ProgressStore {
   data: ProgressState;
   storageError: boolean;
   setCheck: (id: string, checked: boolean) => void;
-  /** Set several entries at once (a group's Check all / Uncheck all). */
   setMany: (ids: string[], checked: boolean) => void;
   /** Put entries back to an earlier state (undo): ids in `prev` become checked, the rest unchecked. */
   restore: (ids: string[], prev: Record<string, true>) => void;
@@ -36,7 +35,6 @@ interface ProgressStore {
 const initial = load();
 
 export const useProgress = create<ProgressStore>((set, get) => {
-  /** Apply a change to the state and persist it. */
   const commit = (recipe: (draft: ProgressState) => ProgressState) => {
     const next = recipe(get().data);
     let storageError = false;
@@ -95,6 +93,4 @@ export const useProgress = create<ProgressStore>((set, get) => {
   };
 });
 
-/** Whether a chapter's content is revealed under the current spoiler settings. */
 export const isOpen = (state: ProgressState, chapter: number) => !state.spoilers || chapter <= state.ceiling;
-export const isChecked = (state: ProgressState, id: string) => state.checks[id] === true;

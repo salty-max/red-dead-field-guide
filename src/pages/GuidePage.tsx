@@ -41,7 +41,7 @@ export function GuidePage() {
         <Breadcrumb current={`Chapter ${chapterId}`} />
         <div className="page-heading">
           <h1>Chapter {chapterId} is hidden</h1>
-          <p>Reveal through this chapter when you’re ready.</p>
+          <p>Revealing it also reveals every chapter before it.</p>
         </div>
         <Button look="" icon="unlock" onClick={() => reveal(chapterId)}>
           Reveal chapter
