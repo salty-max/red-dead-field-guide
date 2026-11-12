@@ -1,7 +1,8 @@
 import { Link } from "react-router";
+import { Calibration } from "../components/Calibration";
 import { Stat } from "../components/Stats";
 import { Breadcrumb, Button, PageHeading, ProgressBar } from "../components/ui";
-import { CHAPTER_COUNT, cats, chapterRows, chapters, coreRows, estimate, two, type CategoryId } from "../lib/guide";
+import { CHAPTER_COUNT, cats, chapterRows, chapters, coreRows, estimate, pointsLeft, two, type CategoryId } from "../lib/guide";
 import { exportProgress } from "../lib/backup";
 import { isOpen, useProgress } from "../store/progress";
 import { useUi } from "../store/ui";
@@ -42,6 +43,7 @@ export function DashboardPage() {
           })}
           {data.spoilers && data.ceiling < CHAPTER_COUNT && <p>{CHAPTER_COUNT - data.ceiling} chapters hidden by spoiler protection.</p>}
         </section>
+        <Calibration />
         <section className="panel">
           <h2>Progress backup</h2>
           <p>Progress lives in this browser. Export a backup to move it to another device or keep a copy.</p>
@@ -51,6 +53,7 @@ export function DashboardPage() {
           </div>
         </section>
       </div>
+      <WhatsLeft />
       <section className="panel">
         <div className="subhead">
           <div>
@@ -65,5 +68,36 @@ export function DashboardPage() {
         </div>
       </section>
     </>
+  );
+}
+
+const pts = (value: number) => (Math.round(value * 10) / 10).toFixed(1);
+
+/** Which categories still cost the most in-game percentage points. */
+function WhatsLeft() {
+  const checks = useProgress((s) => s.data.checks);
+  const items = pointsLeft(checks);
+  const max = Math.max(...items.map((item) => item.total), 1);
+  const left = items.reduce((sum, item) => sum + item.left, 0);
+  return (
+    <section className="panel whats-left" aria-labelledby="whats-left-title">
+      <h2 id="whats-left-title">What’s left</h2>
+      <p>About {pts(left)} points to go. Biggest remaining first, using the estimate’s weights.</p>
+      <ul>
+        {items.map((item) => (
+          <li key={item.tag}>
+            <span className="wl-name">{cats[item.tag][0]}</span>
+            <span className="wl-bar" aria-hidden="true">
+              <span className="wl-total" style={{ width: `${(item.total / max) * 100}%` }}>
+                <span style={{ width: `${((item.total - item.left) / item.total) * 100}%` }} />
+              </span>
+            </span>
+            <span className="wl-pts">
+              {pts(item.left)} <small>of {pts(item.total)} pts left</small>
+            </span>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }

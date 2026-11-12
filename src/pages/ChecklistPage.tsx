@@ -3,7 +3,7 @@ import { useLocation, useParams } from "react-router";
 import { Icon } from "../components/Icon";
 import { RouteGroup } from "../components/RouteGroup";
 import { Breadcrumb, Button, Chip, Empty, PageHeading, SelectField } from "../components/ui";
-import { allRows, CHAPTER_COUNT, cats, chapters, isCategory, readChapter, statusOptions, two } from "../lib/guide";
+import { allRows, CHAPTER_COUNT, cats, chapters, readChapter, statusOptions, tagName, two } from "../lib/guide";
 import { isOpen, useProgress } from "../store/progress";
 
 const topFilters: [string, string][] = [
@@ -14,6 +14,7 @@ const topFilters: [string, string][] = [
   ["bounty", "Bounties"],
   ["challenge", "Challenges"],
   ["outfit", "Outfits"],
+  ["missable", "Missable"],
 ];
 
 export function ChecklistPage() {
@@ -25,7 +26,7 @@ export function ChecklistPage() {
 function ChecklistView() {
   const { category, chapter: chapterParam } = useParams();
   const data = useProgress((s) => s.data);
-  const [filter, setFilter] = useState<string>(isCategory(category) ? category : "all");
+  const [filter, setFilter] = useState<string>(category && topFilters.some(([id]) => id === category) || (category && category in cats) ? category : "all");
   const [chapterFilter, setChapterFilter] = useState(() =>
     chapterParam && isOpen(data, readChapter(chapterParam)) ? String(readChapter(chapterParam)) : "all",
   );
@@ -45,7 +46,7 @@ function ChecklistView() {
       (effectiveChapter === "all" || row.chapter === Number(effectiveChapter)) &&
       (status === "all" || (status === "done") === (data.checks[row.id] === true)) &&
       (!needle ||
-        [row.title, row.text, row.location, row.group, ...row.tags.map((tag) => cats[tag as keyof typeof cats][0])]
+        [row.title, row.text, row.location, row.group, ...row.tags.map(tagName)]
           .join(" ")
           .toLocaleLowerCase()
           .includes(needle)),
@@ -85,7 +86,7 @@ function ChecklistView() {
         <SelectField
           id="collection-category"
           label="Category"
-          choices={[["all", "All categories"], ...Object.entries(cats).map(([id, [name]]): [string, string] => [id, name])]}
+          choices={[["all", "All categories"], ...Object.entries(cats).map(([id, [name]]): [string, string] => [id, name]), ["missable", "Missable"]]}
           value={filter}
           onChange={setFilter}
         />
@@ -119,7 +120,6 @@ function ChecklistView() {
                 location={`Chapter ${two(chapter.id)}`}
                 icon="book"
                 rows={here}
-                complete={false}
                 open
                 highlightedId=""
                 origin
