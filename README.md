@@ -17,9 +17,8 @@ The site uses static HTML, CSS and JavaScript. There are no packages to install.
 - **Guide** starts in New Austin. Reveal chapters as you reach them. Each mission has its own directions and a source link. The order is a practical route through strands that can open in parallel.
 - **Checklist** tracks story missions, Stranger tasks, outfits and scraps, challenges, map locations, bounties, hideouts, properties, purchases, jobs and minigames. Each check is shared with the walkthrough. Use the county buttons after reading a purchased map in-game.
 - **Progress** estimates the game’s weighted percentage, with one point at each rank 5 and 10 challenge milestone. Outfit scraps are tracked individually. The completed outfit supplies the in-game credit. Compare your estimate with **Stats → General**.
-- **Deathless run** is a manual log. You can undo a death or reset the attempt from the dashboard.
 - The sun or moon in the header switches the theme. Choose **Use device setting** under **Appearance** to follow your system.
-- Open **Progress saved** to change spoiler settings or export and import your checklist and run log. Progress is stored for this browser and site address.
+- Open **Progress saved** to change spoiler settings or export and import your checklist. Progress is stored for this browser and site address.
 
 The in-game percentage applies to the base campaign. *Undead Nightmare*, multiplayer, mission medals, platform trophies and optional encounters have separate completion goals. Sources and maps are linked inside the app. Game directions were checked against Switch-era and original-release references.
 

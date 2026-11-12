@@ -7,7 +7,6 @@
     chart:'<path d="M4 4v16h16M8 16v-4m5 4V8m5 8v-6"/>',
     lock:'<rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 1 1 8 0v3m-4 4v3"/>',
     unlock:'<rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 7.6-1.8M12 14v3"/>',
-    shield:'<path d="M12 22s7-3 7-10V5l-7-3-7 3v7c0 7 7 10 7 10Z"/><path d="m9 12 2 2 4-4"/>',
     pin:'<path d="M20 10c0 6-8 11-8 11S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/>',
     home:'<path d="m3 11 9-7 9 7m-16-1v10h14V10m-10 10v-6h6v6"/>',
     shirt:'<path d="m8 4-5 3 2 5 3-1v9h8v-9l3 1 2-5-5-3a4 4 0 0 1-8 0Z"/>',
@@ -25,8 +24,6 @@
     search:'<circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/>',
     info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-8h.01"/>',
     check:'<path d="m5 12 4 4L19 6"/>',
-    plus:'<path d="M12 5v14M5 12h14"/>',
-    minus:'<path d="M5 12h14"/>',
     mountain:'<path d="m2 19 6-9 3 4 4-9 7 14H2Zm11-10 2 2 2-2"/>',
     gem:'<path d="M4 9 8 4h8l4 5-8 11L4 9Zm0 0h16M8 4l4 16 4-16"/>',
     moon:'<path d="M20.8 14.1A9 9 0 0 1 9.9 3.2a9 9 0 1 0 10.9 10.9Z"/>',
@@ -83,8 +80,7 @@
   const byId = new Map(allRows.map((row) => [row.id,row]));
   const coreRows = allRows.filter((row) => !["optional","scrap"].includes(row.tags[0]));
   const storageKey = "red-dead-field-guide.v1";
-  const blankRun = () => ({deaths:0, cleared:false});
-  const defaultState = () => ({version:1, guide:"red-dead-redemption", checks:{}, ceiling:1, spoilers:true, chapter:1, run:blankRun()});
+  const defaultState = () => ({version:1, guide:"red-dead-redemption", checks:{}, ceiling:1, spoilers:true, chapter:1});
   let storageError = false;
   function validateState(value) {
     if (!value || value.version !== 1 || value.guide !== "red-dead-redemption" || !value.checks || Array.isArray(value.checks) || typeof value.checks !== "object") throw new Error("This file is not a Red Dead Field Guide progress backup.");
@@ -93,14 +89,19 @@
     result.ceiling = readChapter(value.ceiling);
     result.chapter = readChapter(value.chapter);
     result.spoilers = value.spoilers !== false;
-    const run = value.run;
-    if (run) result.run = {deaths:Number.isSafeInteger(run.deaths) && run.deaths >= 0 ? run.deaths : 0, cleared:run.cleared === true};
     return result;
   }
   function loadState() {
     try {
       const raw = localStorage.getItem(storageKey);
-      return raw ? validateState(JSON.parse(raw)) : defaultState();
+      if (!raw) return defaultState();
+      const stored = JSON.parse(raw);
+      const restored = validateState(stored);
+      if (Object.hasOwn(stored,"run")) {
+        try { localStorage.setItem(storageKey,JSON.stringify(restored)); }
+        catch { storageError = true; }
+      }
+      return restored;
     } catch {
       storageError = true;
       return defaultState();
@@ -171,11 +172,6 @@
     const href = tag === "overall" ? "#dashboard" : "#checklist/"+tag;
     return '<a class="stat" href="'+href+'"><span class="stat-head"><span class="stat-icon '+tag+'">'+icon(graphic)+'</span>'+name+'</span><span class="stat-values">'+label+' <small>'+detail+'</small></span>'+progress(tag === "overall" ? estimate() : done,tag === "overall" ? 100 : rows.length,name)+'</a>';
   }
-  function deathStat() {
-    const run = state.run;
-    const caption = run.cleared ? (run.deaths === 0 ? "Deathless clear" : "Run cleared") : "Manual log";
-    return '<a class="stat" href="#dashboard/deathless"><span class="stat-head"><span class="stat-icon death">'+icon("shield")+'</span>Deathless Run</span><span class="stat-values">'+run.deaths+' <small>'+ (run.deaths === 1 ? "death" : "deaths")+'</small></span><span class="stat-caption"><span class="live-dot"></span>'+caption+'</span></a>';
-  }
   function crumbs(current, first = "Red Dead Redemption") {
     return '<div class="breadcrumb">'+icon("compass")+'<span>'+esc(first)+'</span>'+icon("right")+'<strong>'+esc(current)+'</strong></div>';
   }
@@ -241,7 +237,7 @@
     const next = chapter.id < chapterCount ? (isOpen(chapter.id+1) ? linkButton("Next chapter","#guide/"+(chapter.id+1),"","arrow") : btn("Reveal next chapter","reveal","","unlock",chapter.id+1)) : linkButton("View progress","#dashboard","", "chart");
     main.innerHTML = crumbs(chapter.title,"Red Dead Redemption")+
       '<section class="hero" data-chapter="'+chapter.id+'"><div class="hero-content"><div class="hero-meta"><span class="kicker">Chapter '+two(chapter.id)+' / '+two(chapterCount)+'</span><span>'+esc(chapter.region)+'</span></div><h1>'+esc(chapter.title)+'</h1><p>'+esc(chapter.intro)+'</p><div class="hero-actions">'+btn(done ? "Resume route" : "Start walkthrough","resume","gold","play")+linkButton("Open checklist","#checklist/all/"+chapter.id,"ghost","checkList")+'</div></div></section>'+
-      '<section class="stats" aria-label="Progress summary">'+stat("overall")+stat("mission")+stat("location")+deathStat()+'</section>'+
+      '<section class="stats" aria-label="Progress summary">'+stat("overall")+stat("mission")+stat("location")+'</section>'+
       '<section id="route" aria-labelledby="route-title"><div class="subhead"><div><h2 id="route-title">Chapter route</h2><p>'+done+' of '+rows.length+' steps complete</p></div><button class="text-link" type="button" data-action="expand">'+icon("down")+'<span>Expand all</span></button></div>'+
       '<div class="toolbar"><div class="chips" aria-label="Route categories">'+labels.map(([id,label]) => chip(label,"route-filter",id,routeFilter)).join("")+'</div>'+select("route-status","Route completion status",statusOptions,routeStatus,true)+'</div>'+
       (groups.length ? groups.map((group,index) => groupHTML(group,group.shown,index,routeFilter!=="all" || routeStatus!=="all")).join("") : noResults("No steps match these filters."))+
@@ -280,26 +276,16 @@
       '<div class="subhead"><p id="results-count" role="status"></p><p>'+checkedCount(visible)+' of '+visible.length+' revealed entries checked</p></div><div id="checklist-results"></div>';
     renderResults();
   }
-  function runPanel() {
-    const run = state.run;
-    const message = run.cleared ? (run.deaths ? "Clear recorded with deaths." : "Deathless clear recorded.") : (run.deaths ? "This attempt has a death on record." : "No deaths logged.");
-    return '<section id="deathless" class="panel"><h2>Deathless run</h2><div class="run-number">'+run.deaths+'<small>'+(run.deaths===1 ? "death" : "deaths")+'</small></div><p>'+message+'</p><div class="controls">'+
-      btn("Log death","death-plus","", "plus")+
-      '<button class="button outline" data-action="death-minus" type="button"'+(run.deaths===0 ? " disabled" : "")+'>'+icon("minus")+'Undo death</button>'+
-      btn(run.cleared ? "Undo clear" : "Record clear","run-clear")+
-      btn("Reset this run","run-reset")+'</div>'+
-      '<p>Log each player death manually. Decide which run rules you want to follow before starting. The run log is separate from your completion checklist.</p></section>';
-  }
   function renderDashboard() {
     const total = coreRows.length;
     const done = checkedCount(coreRows);
     const visible = chapters.filter((chapter) => isOpen(chapter.id));
     main.innerHTML = crumbs("Progress")+'<header class="page-heading"><h1>Your progress</h1><p>Compare the estimate with Stats → General in your game.</p><span class="inline-stat">'+estimate()+'% estimated · '+done+' of '+total+' entries</span></header>'+
-      '<div class="dashboard-grid"><div><section class="panel"><h2>Chapter progress</h2><p>Open a revealed chapter to resume its route.</p>'+visible.map((chapter) => {
+      '<div class="dashboard-grid"><section class="panel"><h2>Chapter progress</h2><p>Open a revealed chapter to resume its route.</p>'+visible.map((chapter) => {
         const rows = chapter.groups.flatMap((group) => group.rows);
         return '<a class="chapter-progress" href="#guide/'+chapter.id+'"><small>'+two(chapter.id)+'</small><strong>'+esc(chapter.title)+'</strong>'+progress(checkedCount(rows),rows.length,chapter.title)+'<small>'+checkedCount(rows)+' / '+rows.length+'</small></a>';
       }).join("")+(state.spoilers && state.ceiling<chapterCount ? '<p>'+(chapterCount-state.ceiling)+' chapters hidden by spoiler protection.</p>' : "")+'</section>'+
-      '<section class="panel"><h2>Progress backup</h2><p>Progress lives in this browser. Export a backup to move it to another device or keep a copy.</p><div class="controls">'+btn("Export progress","export")+btn("Import progress","settings")+'</div></section></div><div>'+runPanel()+'</div></div>'+
+      '<section class="panel"><h2>Progress backup</h2><p>Progress lives in this browser. Export a backup to move it to another device or keep a copy.</p><div class="controls">'+btn("Export progress","export")+btn("Import progress","settings")+'</div></section></div>'+
       '<section class="panel"><div class="subhead"><div><h2>By category</h2><p>The estimate uses the game’s category weights. Ambient Challenges add credit at ranks 5 and 10. Outfit scraps and optional tasks are tracked separately.</p></div></div><div class="category-board">'+Object.keys(cats).map(stat).join("")+'</div></section>';
   }
   function renderSources() {
@@ -348,7 +334,7 @@
     }
     closeMenu();
     draw();
-    const target = highlighted ? document.querySelector("#entry-"+highlighted) : part === "deathless" && view === "dashboard" ? document.querySelector("#deathless") : null;
+    const target = highlighted ? document.querySelector("#entry-"+highlighted) : null;
     if (target) target.scrollIntoView({block:"start"});
     else if (!initial) {
       window.scrollTo(0,0);
@@ -391,14 +377,14 @@
       '<label><input type="checkbox" name="spoilers"'+(state.spoilers ? " checked" : "")+'> Hide later chapters</label>'+
       '<label class="field">Reveal through<select class="select" name="ceiling">'+options(ceilings,state.ceiling)+'</select></label>'+
       '<div class="controls"><button type="submit" class="button">Save settings</button></div></form>'+
-      '<hr><p>Export a copy of all checks, spoiler settings and run logs. Importing replaces the current progress.</p>'+
+      '<hr><p>Export a copy of your checks and spoiler settings. Importing replaces the current progress.</p>'+
       (storageError ? '<p class="inline-error">Browser storage is unavailable. Export a backup before closing this tab.</p>' : '')+
       '<label class="field" for="import-file">Import progress backup<input id="import-file" type="file" accept=".json,application/json"></label><p id="import-status" role="status"></p>'+
       '<div class="controls">'+btn("Export progress","export")+'<button type="button" class="button outline" data-action="import" id="import-button" disabled>Replace with backup</button></div>');
   }
-  function confirm(title, explanation, label, action, danger = false) {
+  function confirm(title, explanation, label, action) {
     confirmAction = action;
-    displayDialog(title,'<p>'+esc(explanation)+'</p><div class="controls">'+btn(label,"confirmed",danger ? "danger" : "")+btn("Cancel","close-dialog")+'</div>');
+    displayDialog(title,'<p>'+esc(explanation)+'</p><div class="controls">'+btn(label,"confirmed","")+btn("Cancel","close-dialog")+'</div>');
   }
   function exportProgress() {
     const href = URL.createObjectURL(new Blob([JSON.stringify(state,null,2)+"\n"],{type:"application/json"}));
@@ -414,7 +400,6 @@
     const button = event.target.closest("button[data-action]");
     if (!button) return;
     const {action,value} = button.dataset;
-    const run = state.run;
     if (action === "toggle-theme") {
       const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
       setTheme(next);
@@ -484,23 +469,6 @@
         });
       }
     }
-    if (action === "death-plus" || action === "death-minus") {
-      run.deaths = action === "death-plus" ? Math.min(Number.MAX_SAFE_INTEGER,run.deaths+1) : Math.max(0,run.deaths-1);
-      persist();
-      refreshFocus({action:run.deaths === 0 ? "death-plus" : action});
-      speak(run.deaths+" deaths logged.");
-    }
-    if (action === "run-clear") {
-      run.cleared = !run.cleared;
-      persist();
-      refreshFocus({action});
-      speak(run.cleared ? "Run clear recorded." : "Run clear removed.");
-    }
-    if (action === "run-reset") confirm("Reset this deathless run?","This clears the manual death count and clear status.","Reset run",() => {
-      state.run = blankRun();
-      persist();
-      refreshFocus({action});
-    },true);
     if (action === "export") exportProgress();
     if (action === "import" && importState) {
       state = importState;
