@@ -359,3 +359,103 @@ dialog .close{position:absolute;right:13px;top:12px}
 .subhead h2{font-size:34px}
 @media(max-width:800px){.brand-type strong{font-size:18px}}
 @media(max-width:550px){.subhead h2{font-size:29px}}
+
+/* ---- UX pass: touch targets, type floor, toast, next up, missables, what's left ---- */
+body{font-size:16px}
+.hero{min-height:210px;padding-block:22px}
+.hero h1{font-size:clamp(40px,5vw,66px);margin-bottom:10px}
+.hero-actions{margin-top:16px}
+.hero-meta{margin-bottom:8px}
+.kicker{font-size:11px}
+.brand-type small{font-size:11px}
+.rail-heading{font-size:12px}
+.rail-credit{font-size:12px}
+.spoiler-card p,.spoiler-card .text-button,.spoiler-card strong{font-size:12px}
+.text-button{display:inline-flex;align-items:center;min-height:32px;padding:4px 0}
+.text-link{min-height:32px;padding:6px 0;font-size:13px}
+.button{min-height:44px;padding:9px 16px;font-size:14px}
+.group-tools .button{min-height:40px;padding:6px 12px;font-size:13px}
+.icon-button{width:40px;height:40px}
+.theme-toggle{width:40px;height:40px}
+.save-status{min-height:40px;font-size:12px}
+.chip{min-height:40px;padding:8px 12px;font-size:12px}
+.select,.search{min-height:40px;font-size:14px}
+.filters .button{min-height:40px}
+.tag{font-size:11px;padding:4px 7px}
+.tag.missable{color:#7a2d1d;background:#f8dccf}
+[data-theme="dark"] .tag.missable{background:#5a2a20;color:#ffd2c0}
+.route-group summary small,.group-count,.stat-values small,.page-heading .inline-stat{font-size:12px}
+.route-group summary h3{font-size:15px}
+.group-note{font-size:13px}
+.route-row .origin{font-size:12px;position:relative;z-index:1;padding:8px 2px;margin:-8px -2px}
+.route-row{position:relative;grid-template-columns:28px minmax(0,1fr) auto;padding:14px;gap:12px}
+.route-row label{font-size:15px}
+.route-row label::after{content:"";position:absolute;inset:0;cursor:pointer}
+.route-row p{font-size:15px;line-height:1.6}
+.route-row input[type=checkbox]{width:26px;height:26px;border-radius:7px;margin:0;position:relative;z-index:1}
+.route-row input:checked::before{width:12px;height:6px}
+.chapter-link{min-height:48px}
+.chapter-name{display:grid;gap:1px;line-height:1.25}
+.chapter-name small{font-size:12px;font-weight:600;color:#c9ad97}
+.chapter-link.locked{font-size:13px}
+.chapter-progress{font-size:13px}
+.top-nav a{font-size:14px}
+.toast-stack{position:fixed;z-index:40;right:16px;bottom:16px;display:grid;gap:10px;max-width:min(380px,calc(100% - 32px));pointer-events:none}
+.toast{pointer-events:auto;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:var(--white);color:var(--ink);box-shadow:0 12px 40px #1c0e0866}
+.toast p{margin:0 0 10px;font-size:14px}
+.toast .controls{display:flex;gap:8px;flex-wrap:wrap}
+.summary-strip{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:14px 0 26px;padding:6px 14px;min-height:44px;background:var(--white);border:1px solid var(--line);border-radius:10px;font-size:14px}
+.summary-strip:hover{border-color:#b59d80}
+.summary-strip strong{font-size:18px;font-variant-numeric:tabular-nums}
+.next-up,.missables{margin-top:16px;background:var(--white);border:1px solid var(--line);border-radius:12px}
+.next-up{padding:14px 16px}
+.next-up h2,.missables summary strong{font:700 24px/1.2 var(--display);letter-spacing:.01em}
+.missables{border-color:#c4623f}
+.missables summary{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 16px;min-height:48px;cursor:pointer}
+.missables summary strong{font-size:22px}
+.next-up ul,.missables ul{list-style:none;margin:8px 0 0;padding:0}
+.missables ul{margin:0;padding:0 16px 8px}
+.next-up li,.missables li{position:relative;display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.next-up li:first-child,.missables li:first-child{border-top:0}
+.next-up input,.missables input{appearance:none;width:26px;height:26px;margin:0;border-radius:7px;border:1px solid #ad957a;background:var(--white);cursor:pointer;position:relative;z-index:1}
+.next-up input:checked,.missables input:checked{background:#91482f}
+[data-theme="dark"] .next-up input,[data-theme="dark"] .missables input{border-color:#b49377;background:var(--paper)}
+.next-up label,.missables label{display:grid;gap:2px;cursor:pointer;line-height:1.3}
+.next-up label::after,.missables label::after{content:"";position:absolute;inset:0}
+.next-up label strong,.missables label strong{font-size:15px}
+.next-up label small,.missables label small{font-size:12px;color:var(--muted)}
+.next-up .origin,.missables .origin{position:relative;z-index:1;font-size:13px;color:var(--fern);text-decoration:underline;text-underline-offset:3px;padding:10px 4px;white-space:nowrap}
+.whats-left{margin-bottom:14px}
+.whats-left ul{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:10px}
+.whats-left li{display:grid;grid-template-columns:minmax(120px,190px) 1fr auto;gap:12px;align-items:center;font-size:14px}
+.wl-bar{display:block;height:10px}
+.wl-total{display:block;height:100%;background:#ebddca;border-radius:10px;overflow:hidden}
+[data-theme="dark"] .wl-total{background:#513a29}
+.wl-total span{display:block;height:100%;background:#a8563b}
+[data-theme="dark"] .wl-total span{background:#d7956d}
+.wl-pts{font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap}
+.wl-pts small{font-weight:600;color:var(--muted);font-size:12px}
+.calibration{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin-top:12px}
+.calibration .field{min-width:160px}
+.panel .delta{font-size:14px;color:var(--ink)}
+.panel .inline-error{font-size:13px}
+@media(max-width:800px){
+  .icon-button,.theme-toggle,.mobile-menu{width:40px;height:40px}
+  .save-status{width:40px;padding:0;font-size:0;gap:0;justify-content:center}
+  .brand-type small{display:none}
+}
+@media(max-width:550px){
+  .hero{min-height:150px;padding:16px 14px}
+  .hero::before{background-image:linear-gradient(90deg,#251810f2 0%,#281b14c4 42%,#2a1b1366 100%),var(--chapter-banner,none)}
+  .hero h1{font-size:38px;margin-bottom:6px}
+  .hero p{display:none}
+  .hero-actions{margin-top:10px}
+  .top-nav a{font-size:11px}
+  .route-row{padding:12px 10px;gap:10px}
+  .route-group summary small{font-size:12px}
+  .whats-left li{grid-template-columns:1fr auto}
+  .wl-bar{grid-column:1/-1;order:3}
+  .next-up,.missables summary{padding-inline:12px}
+  .next-up li,.missables li{gap:10px}
+  .toast-stack{left:12px;right:12px;bottom:12px;max-width:none}
+}

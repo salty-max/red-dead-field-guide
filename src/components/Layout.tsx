@@ -4,7 +4,8 @@ import { Icon } from "./Icon";
 import { IconButton } from "./ui";
 import { DialogHost } from "./DialogHost";
 import { UpdatePrompt } from "./UpdatePrompt";
-import { byId, chapters, readChapter, two } from "../lib/guide";
+import { UndoToast } from "./UndoToast";
+import { byId, chapterRows, chapters, pct, readChapter, two } from "../lib/guide";
 import { isOpen, useProgress } from "../store/progress";
 import { useReveal } from "../lib/useReveal";
 import { useTheme } from "../store/theme";
@@ -68,18 +69,23 @@ function Rail({ id, className, activeChapter, view, railRef }: { id: string; cla
               return (
                 <button key={chapter.id} className="chapter-link locked" type="button" onClick={() => reveal(chapter.id)}>
                   <span className="number">{n}</span>
-                  <span>Chapter {n}</span>
+                  <span>{chapter.teaser}</span>
                   <Icon name="lock" />
-                  <span className="sr-only"> · spoilers hidden</span>
+                  <span className="sr-only"> · hidden by spoiler protection. Reveal chapter {chapter.id}</span>
                 </button>
               );
             }
             const current = view === "guide" && activeChapter === chapter.id;
-            const complete = chapter.groups.every((group) => group.rows.every((row) => data.checks[row.id] === true));
+            const rows = chapterRows(chapter);
+            const done = rows.filter((row) => data.checks[row.id] === true).length;
+            const complete = done === rows.length;
             return (
               <Link key={chapter.id} className="chapter-link" to={`/guide/${chapter.id}`} aria-current={current ? "page" : undefined}>
                 <span className="number">{n}</span>
-                <span>{chapter.title}</span>
+                <span className="chapter-name">
+                  {chapter.title}
+                  <small>{complete ? "Complete" : `${pct(done, rows.length)}% done`}</small>
+                </span>
                 <Icon name={complete ? "check" : "right"} />
               </Link>
             );
@@ -207,7 +213,10 @@ export function Layout({ children }: { children: ReactNode }) {
         </main>
       </div>
       <DialogHost />
-      <UpdatePrompt />
+      <div className="toast-stack">
+        <UndoToast />
+        <UpdatePrompt />
+      </div>
       <div id="status" className="sr-only" role="status">
         {announcement}
       </div>

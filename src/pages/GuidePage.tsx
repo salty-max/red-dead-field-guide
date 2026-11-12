@@ -2,10 +2,11 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { Icon } from "../components/Icon";
 import { RouteGroup } from "../components/RouteGroup";
-import { Stat } from "../components/Stats";
+import { MissablesStrip, NextUp } from "../components/NextUp";
+import { Link } from "react-router";
 import { Breadcrumb, Button, Chip, Empty, LinkButton, SelectField } from "../components/ui";
 import { SourceLinks } from "../components/SourceLinks";
-import { byId, CHAPTER_COUNT, chapterRows, chapters, readChapter, statusOptions, two } from "../lib/guide";
+import { byId, CHAPTER_COUNT, chapterRows, chapters, estimate, readChapter, statusOptions, two } from "../lib/guide";
 import { useReveal } from "../lib/useReveal";
 import { isOpen, useProgress } from "../store/progress";
 import { useUi } from "../store/ui";
@@ -19,6 +20,7 @@ const routeLabels: [string, string][] = [
   ["challenge", "Challenges"],
   ["bounty", "Bounties"],
   ["outfit", "Outfits"],
+  ["missable", "Missable"],
 ];
 
 export function GuidePage() {
@@ -143,11 +145,16 @@ function GuideView({ chapter, initialHighlight }: { chapter: Chapter; initialHig
           </div>
         </div>
       </section>
-      <section className="stats" aria-label="Progress summary">
-        <Stat tag="overall" />
-        <Stat tag="mission" />
-        <Stat tag="location" />
-      </section>
+      <NextUp />
+      <MissablesStrip chapter={chapter} />
+      <Link className="summary-strip" to="/dashboard">
+        <span>
+          <strong>{estimate(checks)}%</strong> estimated in-game completion
+        </span>
+        <span className="text-link">
+          Progress <Icon name="right" />
+        </span>
+      </Link>
       <section id="route" aria-labelledby="route-title">
         <div className="subhead">
           <div>
@@ -203,7 +210,6 @@ function GuideView({ chapter, initialHighlight }: { chapter: Chapter; initialHig
               note={group.note}
               source={group.source}
               rows={group.shown}
-              complete={group.shown.length === group.rows.length}
               open={groupOpen(group.key, index, group.shown.map((row) => row.id))}
               highlightedId={highlighted}
               fallbackFocusId="route-status"

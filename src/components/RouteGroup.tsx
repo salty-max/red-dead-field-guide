@@ -2,9 +2,13 @@ import { Link } from "react-router";
 import { Icon, type IconName } from "./Icon";
 import { Button } from "./ui";
 import { cats, primaryTag } from "../lib/guide";
+import { changeChecks } from "../lib/actions";
 import { useProgress } from "../store/progress";
 import { useUi } from "../store/ui";
 import type { Row } from "../types";
+
+/** Unchecking more than this many at once asks first. */
+export const BULK_CONFIRM_THRESHOLD = 10;
 
 interface RowProps {
   row: Row;
@@ -17,8 +21,6 @@ interface RowProps {
 
 export function RouteRow({ row, prefix, highlighted, origin = false, fallbackFocusId }: RowProps) {
   const checked = useProgress((s) => s.data.checks[row.id] === true);
-  const setCheck = useProgress((s) => s.setCheck);
-  const announce = useUi((s) => s.announce);
   const inputId = `${prefix}-${row.id}`;
   const tag = primaryTag(row);
 
@@ -29,26 +31,27 @@ export function RouteRow({ row, prefix, highlighted, origin = false, fallbackFoc
         type="checkbox"
         checked={checked}
         onChange={(event) => {
-          setCheck(row.id, event.target.checked);
-          announce(event.target.checked ? "Checked and saved." : "Unchecked and saved.");
+          changeChecks([row.id], event.target.checked, `${event.target.checked ? "Checked" : "Unchecked"} “${row.title}”.`);
           requestAnimationFrame(() => {
             if (!document.getElementById(inputId)) document.getElementById(fallbackFocusId)?.focus({ preventScroll: true });
           });
         }}
       />
       <div>
+        {/* The label stretches over the whole row (see .route-row label::after), so the row is the tap target. */}
         <label htmlFor={inputId}>{row.title}</label>
         {row.text && <p>{row.text}</p>}
       </div>
       <div className="row-meta">
         <span className={`tag ${tag}`}>{cats[tag][1]}</span>
+        {row.missable && <span className="tag missable">Missable</span>}
         {origin ? (
-          <Link className="origin" to={`/guide/${row.chapter}/${row.id}`}>
+          <Link className="origin" to={`/guide/${row.chapter}/${row.id}`} aria-label={`Open “${row.title}” in chapter ${row.chapter}`}>
             Chapter {row.chapter}
           </Link>
         ) : (
           row.reference && (
-            <a className="origin" href={row.reference} target="_blank" rel="noopener noreferrer" aria-label={`Source for ${row.title}`}>
+            <a className="origin" href={row.reference} target="_blank" rel="noopener noreferrer" aria-label={`Source for ${row.title} (opens in a new tab)`}>
               Source
             </a>
           )
@@ -66,8 +69,6 @@ interface GroupProps {
   note?: string;
   source?: string;
   rows: Row[];
-  /** Every row of the group is shown, so a bulk action covers exactly what is listed. */
-  complete: boolean;
   open: boolean;
   highlightedId: string;
   origin?: boolean;
@@ -76,15 +77,33 @@ interface GroupProps {
   rememberToggle: boolean;
 }
 
-export function RouteGroup({ groupKey, title, location, icon, note, source, rows, complete, open, highlightedId, origin, fallbackFocusId, rememberToggle }: GroupProps) {
+export function RouteGroup({ groupKey, title, location, icon, note, source, rows, open, highlightedId, origin, fallbackFocusId, rememberToggle }: GroupProps) {
   const setGroupOpen = useUi((s) => s.setGroupOpen);
   const openDialog = useUi((s) => s.openDialog);
-  const announce = useUi((s) => s.announce);
   const checks = useProgress((s) => s.data.checks);
-  const checkMany = useProgress((s) => s.checkMany);
   const graphic = (icon ?? cats[primaryTag(rows[0])][2]) as IconName;
   const done = rows.filter((row) => checks[row.id] === true).length;
-  const isCounty = !origin && complete && rows.every((row) => primaryTag(row) === "location");
+  const allDone = done === rows.length;
+
+  const toggleAll = () => {
+    const ids = rows.map((row) => row.id);
+    if (!allDone) {
+      const count = rows.length - done;
+      changeChecks(ids, true, `Checked ${count} in “${title}”.`);
+      return;
+    }
+    const uncheck = () => changeChecks(ids, false, `Unchecked ${ids.length} in “${title}”.`);
+    if (ids.length <= BULK_CONFIRM_THRESHOLD) uncheck();
+    else
+      openDialog({
+        kind: "confirm",
+        title: `Uncheck ${ids.length} entries?`,
+        explanation: `This clears every shown entry in “${title}”. You can undo it right after.`,
+        label: "Uncheck all",
+        danger: true,
+        onConfirm: uncheck,
+      });
+  };
 
   return (
     <details
@@ -108,31 +127,17 @@ export function RouteGroup({ groupKey, title, location, icon, note, source, rows
         </span>
         <Icon name="down" className="svg-icon caret" />
       </summary>
-      {(note || source) && (
+      {(note || source || (!origin && rows.length > 1)) && (
         <div className="group-note">
           {note && <p>{note}</p>}
           <div className="group-tools">
-            {isCounty && done < rows.length && (
-              <Button
-                icon="check"
-                onClick={() =>
-                  openDialog({
-                    kind: "confirm",
-                    title: `Mark ${location} discovered?`,
-                    explanation: "Check that your game map shows the county and every location in this list.",
-                    label: "Mark discovered",
-                    onConfirm: () => {
-                      checkMany(rows.map((row) => row.id));
-                      announce(`${location} marked discovered.`);
-                    },
-                  })
-                }
-              >
-                Mark county discovered
+            {!origin && rows.length > 1 && (
+              <Button icon="check" onClick={toggleAll} aria-label={`${allDone ? "Uncheck" : "Check"} all ${rows.length} entries in ${title}`}>
+                {allDone ? "Uncheck all" : "Check all"}
               </Button>
             )}
             {source && (
-              <a className="text-link" href={source} target="_blank" rel="noopener noreferrer">
+              <a className="text-link" href={source} target="_blank" rel="noopener noreferrer" aria-label={`Open reference for ${title} (opens in a new tab)`}>
                 Open reference <Icon name="right" />
               </a>
             )}
