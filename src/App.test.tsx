@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { App } from "./App";
 import { STORAGE_KEY, defaultState } from "./lib/progress-state";
@@ -40,12 +40,21 @@ describe("App", () => {
     expect(useProgress.getState().data.ceiling).toBe(3);
   });
 
-  it("marks a whole county discovered", async () => {
+  it("checks a whole group, then undoes it from the toast", async () => {
     const user = userEvent.setup();
     render(<App />);
     await screen.findByRole("heading", { level: 1, name: chapters[0].title });
-    await user.click(screen.getAllByRole("button", { name: "Mark county discovered" })[0]);
-    await user.click(screen.getByRole("button", { name: "Mark discovered" }));
-    expect(Object.keys(useProgress.getState().data.checks).length).toBeGreaterThan(5);
+    await user.click(screen.getAllByRole("button", { name: /^Check all \d+ entries/ })[0]);
+    expect(Object.keys(useProgress.getState().data.checks).length).toBeGreaterThan(1);
+    await user.click(await screen.findByRole("button", { name: "Undo" }));
+    expect(useProgress.getState().data.checks).toEqual({});
+  });
+
+  it("lists the next unchecked steps and gives every source link a name", async () => {
+    render(<App />);
+    await screen.findByRole("heading", { level: 2, name: "Next up" });
+    expect(within(screen.getByRole("region", { name: "Next up" })).getAllByRole("link", { name: /^Jump to/ })).toHaveLength(3);
+    for (const link of screen.getAllByRole("link", { name: /^Source for/ })) expect(link).toHaveAccessibleName();
+    expect(screen.queryByRole("link", { name: "Source" })).toBeNull();
   });
 });

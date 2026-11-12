@@ -5,7 +5,16 @@ export type DialogState =
   | { kind: "confirm"; title: string; explanation: string; label: string; danger?: boolean; onConfirm: () => void }
   | null;
 
+export interface Toast {
+  id: number;
+  message: string;
+  undo?: () => void;
+}
+
 interface UiStore {
+  toast: Toast | null;
+  showToast: (message: string, undo?: () => void) => void;
+  dismissToast: () => void;
   /** Message for the polite live region. */
   announcement: string;
   announce: (text: string) => void;
@@ -18,7 +27,12 @@ interface UiStore {
   setGroupsOpen: (keys: string[], open: boolean) => void;
 }
 
+let toastId = 0;
+
 export const useUi = create<UiStore>((set) => ({
+  toast: null,
+  showToast: (message, undo) => set({ toast: { id: ++toastId, message, undo } }),
+  dismissToast: () => set({ toast: null }),
   announcement: "",
   announce: (announcement) => set({ announcement }),
   dialog: null,
